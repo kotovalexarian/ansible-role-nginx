@@ -1,0 +1,14 @@
+---
+- name: Purge Nginx
+  apt:
+    state: absent
+    purge: true
+    name:
+      - nginx
+      - nginx-common
+      - nginx-core
+
+- name: Delete Nginx configuration
+  file:
+    state: absent
+    path: '{{ nginx__conf_dir }}'

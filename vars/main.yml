@@ -1,0 +1,6 @@
+---
+nginx__conf_dir: '/etc/nginx'
+nginx__confd_dir:     '{{ nginx__conf_dir }}/conf.d'
+nginx__available_dir: '{{ nginx__conf_dir }}/sites-available'
+nginx__enabled_dir:   '{{ nginx__conf_dir }}/sites-enabled'
+nginx__snippets_dir:  '{{ nginx__conf_dir }}/snippets'

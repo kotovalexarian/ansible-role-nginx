@@ -1,0 +1,13 @@
+---
+- fail:
+    msg: 'Invalid `nginx__state`: {{ nginx__state }}'
+  when: (nginx__state != None) and
+        (nginx__state != 'purge') and
+        (nginx__state != 'remove') and
+        (nginx__state != 'install')
+- include_tasks: purge.yml
+  when: nginx__state == 'purge'
+- include_tasks: remove.yml
+  when: nginx__state == 'remove'
+- include_tasks: install.yml
+  when: nginx__state == 'install'

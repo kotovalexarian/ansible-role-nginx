@@ -1,0 +1,9 @@
+---
+- name: Uninstall Nginx
+  apt:
+    state: absent
+    purge: false
+    name:
+      - nginx
+      - nginx-common
+      - nginx-core

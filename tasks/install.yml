@@ -1,0 +1,81 @@
+---
+- name: Install Nginx
+  apt:
+    name: nginx
+
+- name: Create directories for Nginx configuration
+  notify: nginx | Restart Nginx
+  file:
+    state: directory
+    path: '{{ item }}'
+    mode: 'u=rwx,go=rx'
+    owner: root
+    group: root
+  with_items:
+    - '{{ nginx__conf_dir }}'
+    - '{{ nginx__confd_dir }}'
+    - '{{ nginx__available_dir }}'
+    - '{{ nginx__enabled_dir }}'
+    - '{{ nginx__snippets_dir }}'
+
+- name: Disable Nginx access log
+  notify: nginx | Restart Nginx
+  lineinfile:
+    path: '{{ nginx__conf_dir }}/nginx.conf'
+    regexp: '^(\s*)#?\s*access_log\s+\S+\s*;\s*$'
+    line: '\1#access_log /var/log/nginx/access.log;'
+    backrefs: true
+
+- name: Disable Nginx error log
+  notify: nginx | Restart Nginx
+  lineinfile:
+    path: '{{ nginx__conf_dir }}/nginx.conf'
+    regexp: '^(\s*)#?\s*error_log\s+\S+\s*;\s*$'
+    line: '\1#error_log /var/log/nginx/error.log;'
+    backrefs: true
+
+- name: Install Nginx log config
+  notify: nginx | Restart Nginx
+  copy:
+    src: 'files/nginx/syslog.conf'
+    dest: '{{ nginx__confd_dir }}/syslog.conf'
+    mode: 'u=rw,go=r'
+    owner: root
+    group: root
+
+- name: Remove Nginx default site
+  notify: nginx | Restart Nginx
+  file:
+    state: absent
+    path: '{{ nginx__enabled_dir }}/default'
+  when: nginx__remove_default|bool
+
+- name: Add Nginx upstreams
+  notify: nginx | Restart Nginx
+  template:
+    src: 'templates/nginx/upstream.conf'
+    dest: '{{ nginx__confd_dir }}/upstream-{{ item.name }}.conf'
+    mode: 'u=rw,go=r'
+    owner: root
+    group: root
+  with_items: '{{ nginx__upstreams }}'
+
+- name: Add Nginx sites
+  notify: nginx | Restart Nginx
+  template:
+    src: 'templates/nginx/{{ item.type }}.conf'
+    dest: '{{ nginx__available_dir }}/{{ item.domain }}.conf'
+    mode: 'u=rw,go=r'
+    owner: root
+    group: root
+  with_items: '{{ nginx__sites }}'
+
+- name: Enable Nginx sites
+  notify: nginx | Restart Nginx
+  file:
+    state: link
+    src: '{{ nginx__available_dir }}/{{ item.domain }}.conf'
+    dest: '{{ nginx__enabled_dir }}/{{ item.domain }}.conf'
+    owner: root
+    group: root
+  with_items: '{{ nginx__sites }}'
