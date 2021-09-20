@@ -63,7 +63,7 @@
 - name: Add Nginx sites
   notify: nginx | Restart Nginx
   template:
-    content: '{{ item.content }}'
+    src: 'templates/site.conf'
     dest: '{{ nginx__available_dir }}/{{ item.domain }}.conf'
     mode: 'u=rw,go=r'
     owner: root
