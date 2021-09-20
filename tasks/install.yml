@@ -37,7 +37,7 @@
 - name: Install Nginx log config
   notify: nginx | Restart Nginx
   copy:
-    src: 'files/nginx/syslog.conf'
+    src: 'files/syslog.conf'
     dest: '{{ nginx__confd_dir }}/syslog.conf'
     mode: 'u=rw,go=r'
     owner: root
