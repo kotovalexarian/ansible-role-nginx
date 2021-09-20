@@ -53,7 +53,7 @@
 - name: Add Nginx upstreams
   notify: nginx | Restart Nginx
   template:
-    src: 'templates/nginx/upstream.conf'
+    src: 'templates/upstream.conf'
     dest: '{{ nginx__confd_dir }}/upstream-{{ item.name }}.conf'
     mode: 'u=rw,go=r'
     owner: root
